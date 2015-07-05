@@ -1,0 +1,104 @@
+# create maindir myweb
+  mkdir myweb; cd myweb
+
+# create my virtual environment called myvenv
+  virtualenv --python=python2.7 myvenv
+
+# Activate myvenv  when you are in myvenv, the path is prefixed with (myvenv)
+  . myvenv/bin/activate
+
+# install django in myvenv
+  pip install django==1.8
+
+# initiate your web project. This will create sancra dir with 4 files
+# __init__.py settings.py urls.py wsgi.py
+  django-admin startproject sancra .
+
+# Change settings in <mysite>/settings.py
+  modify TIME_ZONE="US/Pacific"
+
+# @ end of setting.py file add
+  STATIC_URL = '/static/'
+  STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# if your website needs to use Database, set it up now.
+# after this, there will be a file db.sqlite3 in the main dir.
+  python manage.py migrate
+
+# start the webserver. Now your web-page is visible, but no content yet.
+  python manage.py runserver
+
+
+
+
+# CREATE DB application in our project.
+# There is now a dir called board with some files & folders.
+  python manage.py startapp board
+
+# Tell django about the new app by inserting "board" in file <site>/settings.py
+# at the end of INSTALLED APPS ={}  It will look like this now:
+
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'board'
+)
+
+
+
+
+# setup the models by editing models.py in board DIR
+# add the following to define your db post
+
+from django.db import models
+from django.utils import timezone
+
+class Post(models.Model):
+    author = models.ForeignKey('auth.User')
+    title = models.CharField(max_length=40)
+    name = models.CharField(max_length=40)
+    city = models.CharField(max_length=20)
+    phone = models.CharField(max_length=30)
+    email = models.EmailField()
+
+    created_date = models.DateTimeField(
+            default=timezone.now)
+    published_date = models.DateTimeField(
+            blank=True, null=True)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+
+
+    models.CharField - this is how you define text with a limited number of characters.
+    models.TextField - this is for long texts without a limit. It will be ideal for a blog post content, right?
+    models.DateTimeField - this is a date and time.
+    models.ForeignKey - this is a link to another model.
+
+# Once the model is created, add the model to our db.  Tell django there are changes by
+  python manage.py makemigrations board
+
+# Now apply the migration file just created to our database.
+  python manage.py migrate board
+
+# create admin for our db
+  python manage.py createsuperuser
+
+  output is ------------
+  Username: admin
+  Email address: admin@admin.com
+  Password:
+  Password (again):
+  Superuser created successfully.
+
+
+# 
